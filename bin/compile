@@ -41,14 +41,18 @@ topic "Updating apt caches"
 apt-get $APT_OPTIONS update | indent
 
 topic "Fetching .debs..."
-apt-get $APT_OPTIONS -y -d install $(cat $BUILD_DIR/Aptfile) | indent
+apt-get install $APT_OPTIONS -y -d --reinstall $(cat $BUILD_DIR/Aptfile) | indent
 
 mkdir -p $BUILD_DIR/.apt
 
-for DEB in $(ls -1 $APT_CACHE_DIR/archives/*.deb); do
+awk '{print "/" $1 "_"}' < $BUILD_DIR/Aptfile > Aptfile.debpatterns
+
+for DEB in $(find $APT_CACHE_DIR/archives/ -name *.deb -type f | grep -f Aptfile.debpatterns); do
   topic "Installing $(basename $DEB)"
   dpkg -x $DEB $BUILD_DIR/.apt/
 done
+
+rm Aptfile.debpatterns
 
 topic "Writing profile script"
 mkdir -p $BUILD_DIR/.profile.d
