@@ -40,10 +40,12 @@ APT_OPTIONS="-o debug::nolocking=true -o dir::cache=$APT_CACHE_DIR -o dir::state
 topic "Updating apt caches"
 apt-get $APT_OPTIONS update | indent
 
-for PACKAGE in $(cat $BUILD_DIR/Aptfile); do
-  topic "Fetching .debs for $PACKAGE"
-  apt-get $APT_OPTIONS -y -d install $PACKAGE | indent
-done
+topic "Fetching compile .debs..."
+whoami
+apt-get -y -d install $(cat $BUILD_DIR/Aptfile.compile) | indent
+
+topic "Fetching .debs..."
+apt-get $APT_OPTIONS -y -d install $(cat $BUILD_DIR/Aptfile) | indent
 
 mkdir -p $BUILD_DIR/.apt
 
@@ -61,9 +63,3 @@ export INCLUDE_PATH="\$HOME/.apt/usr/include:\$INCLUDE_PATH"
 export CPATH="\$INCLUDE_PATH"
 export CPPPATH="\$INCLUDE_PATH"
 EOF
-
-export PATH="$BUILD_DIR/.apt/usr/bin:$PATH"
-export LD_LIBRARY_PATH="$BUILD_DIR/.apt/usr/lib:$LD_LIBRARY_PATH"
-export INCLUDE_PATH="$BUILD_DIR/.apt/usr/include:$INCLUDE_PATH"
-export CPATH="$INCLUDE_PATH"
-export CPPPATH="$INCLUDE_PATH"
