@@ -40,10 +40,6 @@ APT_OPTIONS="-o debug::nolocking=true -o dir::cache=$APT_CACHE_DIR -o dir::state
 topic "Updating apt caches"
 apt-get $APT_OPTIONS update | indent
 
-topic "Fetching compile .debs..."
-whoami
-apt-get -y -d install $(cat $BUILD_DIR/Aptfile.compile) | indent
-
 topic "Fetching .debs..."
 apt-get $APT_OPTIONS -y -d install $(cat $BUILD_DIR/Aptfile) | indent
 
